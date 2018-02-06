@@ -4,7 +4,7 @@ import { Table, Pagination, Popconfirm } from 'antd';
 import styles from './Users.css';
 import { PAGE_SIZE } from '../../constants';
 
-function Users({ list: dataSource, total, page: current }) {
+function Users({ list: dataSource, loading, total, page: current }) {
   function deleteHandler(id) {
     console.warn(`TODO: ${id}`);
   }
@@ -51,6 +51,7 @@ function Users({ list: dataSource, total, page: current }) {
           dataSource={dataSource}
           rowKey={record => record.id}
           pagination={false}
+          loading={loading}
         />
         <Pagination
           className="ant-table-pagination"
@@ -68,7 +69,8 @@ function mapStateToProps(state) {
   return {
     list,
     total,
-    page
+    page,
+    loading: state.loading.models.users
   };
 }
 
