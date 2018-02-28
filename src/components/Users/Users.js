@@ -5,6 +5,7 @@ import { routerRedux } from 'dva/router';
 
 import styles from './Users.css';
 import { PAGE_SIZE } from '../../constants';
+import UserModal from './UserModal';
 
 const queryString = require('query-string');
 
@@ -13,6 +14,24 @@ function Users({ dispatch, list: dataSource, loading, total, page: current }) {
     dispatch({
       type: 'users/remove',
       payload: id
+    });
+  }
+
+  function editHandler(e, record) {
+    e.preventDefault();
+    dispatch({
+      type: 'userModal/show',
+      payload: {
+        title: 'Edit User',
+        record
+      }
+    });
+  }
+
+  function patchHandler(id, values) {
+    dispatch({
+      type: 'users/patch',
+      payload: { id, values }
     });
   }
 
@@ -43,12 +62,12 @@ function Users({ dispatch, list: dataSource, loading, total, page: current }) {
     {
       title: 'Operation',
       key: 'operation',
-      render: (text, { id }) => (
+      render: (text, record) => (
         <span className={styles.operation}>
-          <a href="">Edit</a>
+          <a href="" onClick={e => editHandler(e, record)}>Edit</a>
           <Popconfirm
             title="Confirm to delete?"
-            onConfirm={deleteHandler.bind(null, id)}
+            onConfirm={deleteHandler.bind(null, record.id)}
           >
             <a href="">Delete</a>
           </Popconfirm>
@@ -74,6 +93,7 @@ function Users({ dispatch, list: dataSource, loading, total, page: current }) {
           pageSize={PAGE_SIZE}
           onChange={pageChangeHandler}
         />
+        <UserModal onOk={patchHandler} />
       </div>
     </div>
   );
