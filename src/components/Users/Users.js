@@ -5,6 +5,7 @@ import { routerRedux } from 'dva/router';
 
 import styles from './Users.css';
 import { PAGE_SIZE } from '../../constants';
+import UserModal from './UserModal';
 
 const queryString = require('query-string');
 
@@ -13,6 +14,13 @@ function Users({ dispatch, list: dataSource, loading, total, page: current }) {
     dispatch({
       type: 'users/remove',
       payload: id
+    });
+  }
+
+  function editHandler(id, values) {
+    dispatch({
+      type: 'users/patch',
+      payload: { id, values }
     });
   }
 
@@ -43,12 +51,14 @@ function Users({ dispatch, list: dataSource, loading, total, page: current }) {
     {
       title: 'Operation',
       key: 'operation',
-      render: (text, { id }) => (
+      render: (text, record) => (
         <span className={styles.operation}>
-          <a href="">Edit</a>
+         <UserModal record={record} onOk={editHandler.bind(null, record.id)}>
+           <a>Edit</a>
+         </UserModal>
           <Popconfirm
             title="Confirm to delete?"
-            onConfirm={deleteHandler.bind(null, id)}
+            onConfirm={deleteHandler.bind(null, record.id)}
           >
             <a href="">Delete</a>
           </Popconfirm>
