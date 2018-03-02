@@ -4,7 +4,7 @@ import { Modal, Form, Input } from 'antd';
 
 const FormItem = Form.Item;
 
-function UserModal({ dispatch, visible, title, record, form, onOk }) {
+function UserModal({ dispatch, visible, isCreate, record, form, onOk }) {
   function okHandler() {
     form.validateFields((err, values) => {
       if (!err) {
@@ -30,7 +30,7 @@ function UserModal({ dispatch, visible, title, record, form, onOk }) {
 
   return (
     <Modal
-      title={title}
+      title={isCreate ? 'Create User' : 'Edit User'}
       visible={visible}
       onOk={okHandler}
       onCancel={hideModelHandler}
@@ -72,10 +72,10 @@ function UserModal({ dispatch, visible, title, record, form, onOk }) {
 }
 
 function mapStateToProps(state) {
-  const { visible, record, title } = state.userModal;
+  const { visible, record, isCreate } = state.userModal;
   return {
     visible,
-    title,
+    isCreate,
     record
   };
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'dva';
-import { Table, Pagination, Popconfirm } from 'antd';
+import { Table, Pagination, Popconfirm, Button } from 'antd';
 import { routerRedux } from 'dva/router';
 
 import styles from './Users.css';
@@ -9,7 +9,7 @@ import UserModal from './UserModal';
 
 const queryString = require('query-string');
 
-function Users({ dispatch, list: dataSource, loading, total, page: current }) {
+function Users({ dispatch, list: dataSource, loading, total, page: current, isCreate }) {
   function deleteHandler(id) {
     dispatch({
       type: 'users/remove',
@@ -22,17 +22,35 @@ function Users({ dispatch, list: dataSource, loading, total, page: current }) {
     dispatch({
       type: 'userModal/show',
       payload: {
-        title: 'Edit User',
+        isCreate: false,
         record
       }
     });
   }
 
-  function patchHandler(id, values) {
+  function createHandler() {
     dispatch({
-      type: 'users/patch',
-      payload: { id, values }
+      type: 'userModal/show',
+      payload: {
+        isCreate: true,
+        record: {}
+      }
     });
+  }
+
+  function saveHandler(id, values) {
+    console.log(`id:${id};values:${JSON.stringify(values)}`);
+    if (isCreate) {
+      dispatch({
+        type: 'users/create',
+        payload: { values }
+      });
+    } else {
+      dispatch({
+        type: 'users/patch',
+        payload: { id, values }
+      });
+    }
   }
 
   function pageChangeHandler(page) {
@@ -79,6 +97,9 @@ function Users({ dispatch, list: dataSource, loading, total, page: current }) {
   return (
     <div className={styles.normal}>
       <div>
+        <div className={styles.create}>
+          <Button type="primary" onClick={createHandler}>Create User</Button>
+        </div>
         <Table
           columns={columns}
           dataSource={dataSource}
@@ -93,7 +114,7 @@ function Users({ dispatch, list: dataSource, loading, total, page: current }) {
           pageSize={PAGE_SIZE}
           onChange={pageChangeHandler}
         />
-        <UserModal onOk={patchHandler} />
+        <UserModal onOk={saveHandler} />
       </div>
     </div>
   );
@@ -105,7 +126,8 @@ function mapStateToProps(state) {
     list,
     total,
     page,
-    loading: state.loading.models.users
+    loading: state.loading.models.users,
+    isCreate: state.userModal.isCreate
   };
 }
 
